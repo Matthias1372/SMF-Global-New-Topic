@@ -1,6 +1,6 @@
 # Global New Topic
 
-**Version:** 1.0.0\
+**Version:** 1.0.1\
 **Compatibility:** SMF 2.1.0--2.1.99\
 **License:** BSD-3-Clause
 
@@ -8,8 +8,8 @@ Global New Topic adds a collapsible **Start a new topic** composer to
 normal SMF 2.1 forum pages. Users can choose the destination board
 directly from a dropdown without first opening that board.
 
-Only boards in which the current user has SMF's native `post_new`
-permission are available.
+Only boards in which the current user has SMF's native permission to
+post an approved or moderated new topic are available.
 
 ## Features
 

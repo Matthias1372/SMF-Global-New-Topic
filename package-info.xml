@@ -3,8 +3,16 @@
 <package-info xmlns="http://www.simplemachines.org/xml/package-info" xmlns:smf="http://www.simplemachines.org/">
 	<id>Matthias:GlobalNewTopic</id>
 	<name>Global New Topic</name>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<type>modification</type>
+
+	<upgrade from="1.0.0" for="2.1.0-2.1.99">
+		<require-file name="Sources/GlobalNewTopic.php" destination="$sourcedir" />
+		<require-file name="Themes/default/GlobalNewTopic.template.php" destination="$themes_dir/default" />
+		<require-file name="Themes/default/languages/GlobalNewTopic.english.php" destination="$themes_dir/default/languages" />
+		<require-file name="Themes/default/languages/GlobalNewTopic.german.php" destination="$themes_dir/default/languages" />
+		<require-file name="Themes/default/languages/GlobalNewTopic.german_informal.php" destination="$themes_dir/default/languages" />
+	</upgrade>
 
 	<install for="2.1.0-2.1.99">
 		<readme parsebbc="true">readme.txt</readme>

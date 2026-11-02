@@ -6,7 +6,7 @@
  * @author Matthias
  * @copyright 2026
  * @license BSD-3-Clause
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 if (!defined('SMF'))
