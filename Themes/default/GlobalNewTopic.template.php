@@ -8,7 +8,7 @@
  * @author Matthias
  * @copyright 2026
  * @license BSD-3-Clause
- * @version 1.0.1
+ * @version 1.0.5
  */
 
 if (!defined('SMF'))
@@ -16,7 +16,7 @@ if (!defined('SMF'))
 
 function template_mcp_globalnewtopic_above()
 {
-	global $context, $txt, $scripturl, $modSettings, $options, $settings;
+	global $context, $txt, $scripturl, $modSettings, $options;
 
 	$collapsed = !empty($context['mcp_gnt_collapsed_default']);
 
@@ -355,6 +355,7 @@ function template_mcp_globalnewtopic_above()
 
 			var form = this.form;
 			var editorElement = document.getElementById(this.opts.sPostBoxContainerID);
+			var boardElement = document.getElementById("mcp_gnt_board");
 			var x = [];
 
 			if (!form || !editorElement)
@@ -362,6 +363,24 @@ function template_mcp_globalnewtopic_above()
 
 			if (!this.previewXMLSupported || !window.XMLHttpRequest)
 				return false;
+
+			// The global composer has no board in its page URL. Resolve and
+			// validate the selected destination immediately before previewing,
+			// rather than relying on an earlier change event.
+			if (!boardElement || !boardElement.value)
+			{
+				if (boardElement && typeof boardElement.reportValidity === "function")
+					boardElement.reportValidity();
+
+				return false;
+			}
+
+			this.opts.iCurrentBoard = parseInt(boardElement.value, 10);
+
+			if (!this.opts.iCurrentBoard)
+				return false;
+
+			x[x.length] = "board=" + this.opts.iCurrentBoard;
 
 			if ("subject" in form)
 				x[x.length] = "subject=" + form.elements["subject"].value.php_to8bit().php_urlencode();
@@ -395,7 +414,7 @@ function template_mcp_globalnewtopic_above()
 
 			sendXMLDocument(
 				smf_prepareScriptUrl(smf_scripturl)
-					+ "action=post2;board=" + parseInt(this.opts.iCurrentBoard)
+					+ "action=post2;board=" + this.opts.iCurrentBoard
 					+ ";preview;xml",
 				x.join("&"),
 				this.onDocSent.bind(this)
@@ -415,13 +434,17 @@ function template_mcp_globalnewtopic_above()
 			if (!XMLDoc || !XMLDoc.getElementsByTagName("smf")[0])
 			{
 				this.previewXMLSupported = false;
+				setInnerHTML(document.getElementById(this.opts.sPreviewBodyContainerID), this.opts.sTxtPreviewError);
 				return false;
 			}
 
 			var preview = XMLDoc.getElementsByTagName("smf")[0].getElementsByTagName("preview")[0];
 
 			if (!preview)
+			{
+				setInnerHTML(document.getElementById(this.opts.sPreviewBodyContainerID), this.opts.sTxtPreviewError);
 				return false;
+			}
 
 			var subjectNode = preview.getElementsByTagName("subject")[0];
 			var bodyNode = preview.getElementsByTagName("body")[0];
@@ -502,6 +525,7 @@ function template_mcp_globalnewtopic_above()
 			sPostBoxContainerID: ', JavaScriptEscape($context['mcp_gnt_post_box_name']), ',
 			sTxtPreviewTitle: ', JavaScriptEscape($txt['preview_title']), ',
 			sTxtPreviewFetch: ', JavaScriptEscape($txt['preview_fetch']), ',
+			sTxtPreviewError: ', JavaScriptEscape($txt['error_while_submitting']), ',
 			sSessionVar: ', JavaScriptEscape($context['session_var']), ',
 			iCurrentBoard: ', (int) $context['mcp_gnt_default_board'], '
 		});
@@ -521,6 +545,17 @@ function template_mcp_globalnewtopic_above()
 			var board = document.getElementById("mcp_gnt_board");
 
 			current_board = board && board.value ? parseInt(board.value, 10) : null;
+
+			// smf_fileUpload() builds its upload URL when Dropzone is created.
+			// Keep that cached URL in sync with the destination board so SMF can
+			// check board-specific attachment permissions, including for guests.
+			var attachmentUpload = document.getElementById("attachment_upload");
+
+			if (attachmentUpload && attachmentUpload.dropzone)
+				attachmentUpload.dropzone.options.url = smf_prepareScriptUrl(smf_scripturl)
+					+ "action=uploadAttach;sa=add;"
+					+ smf_session_var + "=" + smf_session_id
+					+ (current_board ? ";board=" + current_board : "");
 
 			if (current_board === null)
 				return false;

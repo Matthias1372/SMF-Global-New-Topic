@@ -8,12 +8,11 @@
  * @author Matthias
  * @copyright 2026
  * @license BSD-3-Clause
- * @version 1.0.1
+ * @version 1.0.5
  */
 
 // Global New Topic - Deutsch (Sie)
 $txt['mcp_gnt_title'] = 'Neues Thema starten';
-$txt['mcp_gnt_board'] = 'Board';
 $txt['mcp_gnt_choose_board'] = 'Board auswählen';
 $txt['mcp_gnt_admin_title'] = 'Global New Topic';
 $txt['mcp_gnt_enabled'] = 'Globale Maske für neue Themen aktivieren';
@@ -26,5 +25,4 @@ $txt['mcp_gnt_guests'] = 'Gäste';
 $txt['mcp_gnt_regular_members'] = 'Normale Mitglieder';
 $txt['mcp_gnt_saved'] = 'Einstellungen wurden gespeichert.';
 
-$txt['mcp_gnt_post_in'] = 'Posten in';
 $txt['mcp_gnt_click_to_start'] = 'Klicken Sie hier, um ein neues Thema zu starten';

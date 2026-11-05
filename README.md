@@ -1,6 +1,6 @@
 # Global New Topic
 
-**Version:** 1.0.1\
+**Version:** 1.0.5\
 **Compatibility:** SMF 2.1.0--2.1.99\
 **License:** BSD-3-Clause
 

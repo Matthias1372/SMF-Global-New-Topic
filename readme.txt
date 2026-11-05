@@ -1,4 +1,4 @@
-[center][size=16pt][b]Global New Topic 1.0.1[/b][/size][/center]
+[center][size=16pt][b]Global New Topic 1.0.5[/b][/size][/center]
 
 [b]Description[/b]
 Adds a collapsible "Start a new topic" composer to normal SMF 2.1 forum pages.
@@ -32,7 +32,7 @@ Uninstall the package through SMF's Package Manager. The package removes its hoo
 SMF 2.1.x
 
 [b]Version[/b]
-1.0.1
+1.0.5
 
 [b]License[/b]
 BSD-3-Clause

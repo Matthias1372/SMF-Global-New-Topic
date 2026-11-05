@@ -8,7 +8,7 @@
  * @author Matthias
  * @copyright 2026
  * @license BSD-3-Clause
- * @version 1.0.1
+ * @version 1.0.5
  */
 
 if (!defined('SMF'))
@@ -351,12 +351,6 @@ function mcp_gnt_load_theme()
 		&& $modSettings['attachmentEnable'] == 1
 		&& (!empty($post_attachment_boards) || !empty($unapproved_attachment_boards));
 
-	$context['current_attachments'] = [];
-	$context['attachments'] = [
-		'total_size' => 0,
-		'quantity' => 0,
-	];
-
 	if ($context['can_post_attachment'])
 	{
 		$context['num_allowed_attachments'] = empty($modSettings['attachmentNumPerPostLimit'])
@@ -426,6 +420,14 @@ function mcp_gnt_load_theme()
 			maxTotalSize: ' . (!empty($modSettings['attachmentPostLimit']) ? $modSettings['attachmentPostLimit'] : '0') . ',
 			maxFilesize: ' . (!empty($modSettings['attachmentSizeLimit']) ? $modSettings['attachmentSizeLimit'] : '0') . '
 		});
+
+		var mcpGntAttachmentUpload = document.getElementById("attachment_upload");
+
+		if (mcpGntAttachmentUpload && mcpGntAttachmentUpload.dropzone)
+			mcpGntAttachmentUpload.dropzone.on("sending", function(file, xhr, formData) {
+				if (current_board)
+					formData.append("board", current_board);
+			});
 	});', true);
 
 		// Native Post.php removes the non-JavaScript attachment UI once JS is available.
@@ -435,7 +437,6 @@ function mcp_gnt_load_theme()
 	// Native submit-once protection used by action=post/action=post2.
 	checkSubmitOnce('register');
 
-	$context['mcp_gnt_boards'] = $boards;
 	$context['mcp_gnt_collapsed_default'] = !empty($modSettings['mcp_gnt_collapsed_default']);
 
 	if (!isset($context['template_layers']) || !is_array($context['template_layers']))
@@ -544,7 +545,7 @@ function mcp_gnt_get_membergroups()
 
 function mcp_gnt_get_postable_boards()
 {
-	global $modSettings, $smcFunc;
+	global $modSettings, $sourcedir;
 
 	// Match SMF's native new-topic permission lookup. When post moderation is
 	// active, a user (especially a guest) may be allowed to submit an
@@ -559,40 +560,33 @@ function mcp_gnt_get_postable_boards()
 	if (empty($allowed_boards))
 		return [];
 
-	$params = [];
-	$where_allowed = '';
+	require_once($sourcedir . '/Subs-MessageIndex.php');
 
-	// Board 0 is SMF's special value meaning "all boards".
-	if (!in_array(0, $allowed_boards, true))
-	{
-		$where_allowed = 'AND b.id_board IN ({array_int:allowed_boards})';
-		$params['allowed_boards'] = $allowed_boards;
-	}
-
-	$request = $smcFunc['db_query']('', '
-		SELECT b.id_board, b.name AS board_name, b.child_level,
-			c.name AS category_name, c.cat_order, b.board_order
-		FROM {db_prefix}boards AS b
-			INNER JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)
-		WHERE b.redirect = {string:empty_redirect}
-			' . $where_allowed . '
-		ORDER BY c.cat_order, b.board_order',
-		$params + ['empty_redirect' => '']
-	);
+	// Use SMF's native board-list builder so the selector applies the same
+	// visibility checks and hierarchy rules as action=post.
+	$board_list = getBoardList([
+		'included_boards' => in_array(0, $allowed_boards, true) ? null : $allowed_boards,
+		'not_redirection' => true,
+		'use_permissions' => true,
+	]);
 
 	$boards = [];
 
-	while ($row = $smcFunc['db_fetch_assoc']($request))
+	foreach ($board_list as $category)
 	{
-		$boards[] = [
-			'id' => (int) $row['id_board'],
-			'name' => $row['board_name'],
-			'category' => $row['category_name'],
-			'child_level' => (int) $row['child_level'],
-		];
-	}
+		if (empty($category['boards']) || !is_array($category['boards']))
+			continue;
 
-	$smcFunc['db_free_result']($request);
+		foreach ($category['boards'] as $board_data)
+		{
+			$boards[] = [
+				'id' => (int) $board_data['id'],
+				'name' => $board_data['name'],
+				'category' => $category['name'],
+				'child_level' => (int) $board_data['child_level'],
+			];
+		}
+	}
 
 	return $boards;
 }

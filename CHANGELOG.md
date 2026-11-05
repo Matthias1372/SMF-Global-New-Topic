@@ -2,6 +2,35 @@
 
 All notable changes to Global New Topic are documented in this file.
 
+## [1.0.5] - 2026-11-05
+
+### Fixed
+
+- Fixed guest previews remaining at "Fetching preview..." by resolving and validating the selected board at preview time and including it in both the preview URL and request data.
+- Added a visible error fallback when SMF returns no valid preview XML response.
+
+## [1.0.4] - 2026-11-05
+
+### Changed
+
+- Replaced the custom destination-board database query with SMF's native `getBoardList()` logic, including its board visibility and hierarchy checks.
+
+### Removed
+
+- Removed unused attachment context values, the unused board-list context value, an unused template global, and two unused language strings.
+
+## [1.0.3] - 2026-11-02
+
+### Fixed
+
+- Added the selected board ID directly to every attachment upload request, ensuring SMF can perform board-specific attachment permission checks for members and guests without relying only on Dropzone's cached URL.
+
+## [1.0.2] - 2026-11-02
+
+### Fixed
+
+- Updated the active SMF Dropzone upload URL whenever the destination board changes, ensuring that guest attachment uploads include the selected board and pass board-specific permission checks.
+
 ## [1.0.1] - 2026-11-02
 
 ### Added
@@ -29,5 +58,6 @@ All notable changes to Global New Topic are documented in this file.
 - Added native SMF editor, preview, draft, attachment, and additional-option support.
 - Added per-member-group visibility settings and English, German, and German informal translations.
 
+[1.0.5]: https://github.com/Matthias1372/SMF-Global-New-Topic/compare/1.0.1...1.0.5
 [1.0.1]: https://github.com/Matthias1372/SMF-Global-New-Topic/compare/48df2e15d2512f643079cb037be8c5825265f6a1...95a275c8111a39e93c8e3be26fd9f2dc4004b70d
 [1.0.0]: https://github.com/Matthias1372/SMF-Global-New-Topic/releases/tag/1.0.0
